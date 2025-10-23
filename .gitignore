@@ -85,3 +85,8 @@ certs/
 *.log
 *.tmp
 .cache/
+
+.env
+*.pfx
+*.p12
+certs/
