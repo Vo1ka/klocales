@@ -12,7 +12,7 @@ export class GeoParser {
 
     parts.forEach(part => {
       // Паттерн: буква-двухбуквенный_код
-      const match = part.match(/^([A-Z])-([A-Z]{2})$/i);
+      const match = part.match(/^([A-Z])-([A-Z]{2,5})$/i);
       
       if (match) {
         const prefix = match[1].toUpperCase();
@@ -25,7 +25,11 @@ export class GeoParser {
           checked: false, 
           note: ''
         });
+      } else {
+        // Логируем неподдерживаемые форматы для отладки
+        console.warn(`Неподдерживаемый формат гео-кода: "${part}"`);
       }
+
     });
     return geoCodes.sort((a, b) => a.country.localeCompare(b.country));
   }
