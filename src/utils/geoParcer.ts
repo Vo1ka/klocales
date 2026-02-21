@@ -1,4 +1,5 @@
 import type { GeoCode, UrlGroup } from "../types";
+import * as XLSX from 'xlsx';
 
 export class GeoParser {
   static parseGeoCodes(input: string): GeoCode[] {
@@ -11,7 +12,7 @@ export class GeoParser {
     const geoCodes: GeoCode[] = [];
 
     parts.forEach(part => {
-      // Паттерн: буква-двухбуквенный_код
+      // Паттерн: буква-двухбуквенный_код (и от 2 до 5 букв)
       const match = part.match(/^([A-Z])-([A-Z]{2,5})$/i);
       
       if (match) {
@@ -119,4 +120,57 @@ export class GeoParser {
 
     return md;
   }
+
+  /**
+   * Экспорт данных в Excel (.xlsx)
+   */
+  static exportToExcel(data: UrlGroup | UrlGroup[]): void {
+    const groups = Array.isArray(data) ? data : [data];
+    if (groups.length === 0) return;
+
+    const workbook = XLSX.utils.book_new();
+
+    // Создаем отдельный лист (worksheet) для КАЖДОГО URL
+    groups.forEach((group, index) => {
+      const rows = group.geoCodes.map(geo => ({
+        'ГЕО-КОД': geo.code,
+        'СТАТУС': geo.checked ? '✅ Выполнено' : '❌ Не выполнено',
+        'ЗАМЕТКА': geo.note || ''
+      }));
+
+      const worksheet = XLSX.utils.json_to_sheet(rows);
+      
+      // Настраиваем ширину колонок
+      worksheet['!cols'] = [
+        { wch: 15 }, // ГЕО-КОД
+        { wch: 20 }, // СТАТУС
+        { wch: 50 }  // ЗАМЕТКА
+      ];
+
+      // Имя листа в Excel (макс 31 символ, без спецсимволов \ / ? * [ ])
+      let sheetName = group.url.replace(/[\\\/\?\*\[\]:]/g, '_').substring(0, 31);
+      if (!sheetName) sheetName = `Страница ${index + 1}`;
+
+      // Фикс дубликатов имен листов (если URL обрезался одинаково)
+      const existingNames = workbook.SheetNames;
+      if (existingNames.includes(sheetName)) {
+         sheetName = `${sheetName.substring(0, 27)}_${index}`;
+      }
+
+      XLSX.utils.book_append_sheet(workbook, worksheet, sheetName);
+    });
+
+    // Формируем имя файла
+    const date = new Date().toISOString().split('T')[0];
+    let fileName = `geo-export-all-${date}.xlsx`;
+
+    // Если экспортируем только одну карточку, называем файл её именем
+    if (!Array.isArray(data)) {
+       const safeUrl = data.url.replace(/[^a-z0-9]/gi, '_').substring(0, 20).toLowerCase();
+       fileName = `geo-${safeUrl}-${date}.xlsx`;
+    }
+
+    XLSX.writeFile(workbook, fileName);
+  }
+
 }

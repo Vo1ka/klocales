@@ -9,6 +9,7 @@ interface GeoTableProps {
   onUpdateNote: (urlId: string, geoCode: string, note: string) => void;
   onDeleteGroup: (urlId: string) => void;
   onExport?: (format: 'json' | 'csv' | 'markdown') => string; 
+  onExportExcel: (group?: UrlGroup) => void;
 }
 
 export const GeoTable: React.FC<GeoTableProps> = ({
@@ -16,10 +17,12 @@ export const GeoTable: React.FC<GeoTableProps> = ({
   onToggleCheck,
   onUpdateNote,
   onDeleteGroup,
+  onExportExcel
 }) => {
   if (urlGroups.length === 0) {
     return null;
   }
+  
   // Подсчёт статистики
   const totalGeos = urlGroups.reduce((sum, group) => sum + group.geoCodes.length, 0);
   const checkedGeos = urlGroups.reduce(
@@ -73,20 +76,41 @@ export const GeoTable: React.FC<GeoTableProps> = ({
         </div>
       </div>
 
+      {/* Глобальная кнопка экспорта ВСЕХ карточек (в 1 файл, где каждая карточка - это отдельный лист) */}
+      <div className="geo-table-header" style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '1.5rem' }}>
+        <button 
+          onClick={() => onExportExcel()} 
+          className="btn btn-primary"
+          style={{ padding: '0.75rem 1.5rem', fontSize: '1rem' }}
+        >
+          📊 Экспортировать ВСЁ в Excel
+        </button>
+      </div>
+
       <div className="geo-table-content">
         {urlGroups.map((group) => (
           <div key={group.id} className="url-group">
-            <div className="url-group-header">
+            
+            <div className="url-group-header-card">
               <div className="url-title">
                 <span className="url-icon">🌐</span>
                 <h3>{group.url}</h3>
               </div>
+              
               <button
                 onClick={() => onDeleteGroup(group.id)}
-                className="btn-delete"
-                title="Удалить группу"
+                className="btn-delete-card"
+                title="Удалить страницу"
               >
                 🗑️
+              </button>
+              
+              <button 
+                onClick={() => onExportExcel(group)} 
+                className="btn-excel-card"
+                title="Экспорт только этой страницы"
+              >
+                📊 Excel
               </button>
             </div>
 
@@ -94,9 +118,9 @@ export const GeoTable: React.FC<GeoTableProps> = ({
               <table>
                 <thead>
                   <tr>
-                    <th className="col-geo">Гео-код</th>
-                    <th className="col-status">Статус</th>
-                    <th className="col-note">Заметка</th>
+                    <th className="col-geo">ГЕО-КОД</th>
+                    <th className="col-status">СТАТУС</th>
+                    <th className="col-note">ЗАМЕТКА</th>
                   </tr>
                 </thead>
                 <tbody>

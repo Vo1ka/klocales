@@ -1,6 +1,6 @@
 {
   "name": "kaspersky-locales",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "author": "Vladimir Sukhov",
   "description": "Kaspersky Locales",
   "type": "module",
@@ -16,7 +16,6 @@
     "electron:build:mac": "npm run build && electron-builder --mac",
     "electron:build:linux": "npm run build && electron-builder --linux",
     "release": "npm run build && electron-builder --publish always"
-
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
@@ -25,7 +24,9 @@
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
     "react-hook-form": "^7.65.0",
-    "zod": "^4.1.12"
+    "xlsx": "^0.18.5",
+    "zod": "^4.1.12",
+    "zustand": "^5.0.11"
   },
   "devDependencies": {
     "@eslint/js": "^9.36.0",
@@ -33,6 +34,7 @@
     "@types/node": "^24.9.1",
     "@types/react": "^19.1.16",
     "@types/react-dom": "^19.1.6",
+    "@types/xlsx": "^0.0.35",
     "@vitejs/plugin-react": "^4.3.4",
     "autoprefixer": "^10.4.20",
     "concurrently": "^9.1.2",
@@ -85,7 +87,8 @@
           ]
         }
       ],
-      "icon": "build/icon.png"    },
+      "icon": "build/icon.png"
+    },
     "mac": {
       "target": [
         "dmg"
