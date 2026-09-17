@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { GeoTable } from './components/GeoTable/GeoTable';
 import './App.css';
 import { useAppStore } from './hooks/useAppStore';
@@ -17,16 +17,6 @@ function App() {
   const activeTab = store.tabs.find(t => t.id === store.activeTabId);
 
   if (!activeTab) return null;
-
-  // Функция для текстовых экспортов (JSON, CSV, MD)
-  const handleExportText = (format: 'json' | 'csv' | 'markdown') => {
-    switch (format) {
-      case 'json': return GeoParser.exportToJSON(activeTab.urlGroups);
-      case 'csv': return GeoParser.exportToCSV(activeTab.urlGroups);
-      case 'markdown': return GeoParser.exportToMarkdown(activeTab.urlGroups);
-      default: return '';
-    }
-  };
 
   return (
     <div className="app">
